@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Six Waves Maths · Sydney. We help your child succeed. One lesson a week, six days of follow-up.">
-<!-- Six Waves Maths 홍보 사이트 전체 시안 v3 · 번갈아 판 (첫 화면 짙게, 다음 칸 희게, 그다음 짙게 …). 짙은 판을 바탕으로 .lt 칸만 밝은 규칙으로 덮어쓴다. (Moses 2026-11-04 선택). 첫 화면은 흰 파도 여섯 줄이 모여 바다 지구가 되는 캔버스. 제목 "We help your child succeed." 나머지 칸은 Flowmapp 판(v2)의 내용 그대로. 흰 캔버스, Inter 큰 검정 제목, 파란색(#0080ff) 하나만 버튼·링크에, 1px 회색 테두리 카드, 떠 있는 아이패드 목업과 가는 파란 연결선, 파스텔 동그라미 배지. 문구는 CMC 판 v1.8 과 같다. 하루 체험은 전부 지어낸 예시. -->
+<!-- Six Waves Maths 홍보 사이트 전체 시안 v3 · 번갈아 판 (첫 화면 짙게, 다음 칸 희게, 그다음 짙게 …). 첫 화면은 D 배치: 큰 구가 제목 뒤에 옅게. 짙은 판을 바탕으로 .lt 칸만 밝은 규칙으로 덮어쓴다. (Moses 2026-11-04 선택). 첫 화면은 흰 파도 여섯 줄이 모여 바다 지구가 되는 캔버스. 제목 "We help your child succeed." 나머지 칸은 Flowmapp 판(v2)의 내용 그대로. 흰 캔버스, Inter 큰 검정 제목, 파란색(#0080ff) 하나만 버튼·링크에, 1px 회색 테두리 카드, 떠 있는 아이패드 목업과 가는 파란 연결선, 파스텔 동그라미 배지. 문구는 CMC 판 v1.8 과 같다. 하루 체험은 전부 지어낸 예시. -->
 <title>Six Waves Maths</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Caveat:wght@500&display=swap">
@@ -64,7 +64,11 @@ h3{margin:0;font-weight:500;font-size:20px;line-height:1.3;letter-spacing:-.02em
 @media (min-width:760px){.fcard{padding:36px}}
 
 /* 첫 화면: 파도 → 지구 */
-.hero{position:relative;min-height:calc(100svh - 64px);display:grid;place-items:end center;text-align:center;padding-block:0 9vh;overflow:hidden}
+.hero{position:relative;min-height:calc(100svh - 64px);display:grid;place-items:center;text-align:center;padding-block:4vh;overflow:hidden}
+.hero canvas.globe{opacity:.6;transition:filter 1.6s ease,opacity 1.6s ease}
+.hero.word canvas.globe{filter:blur(3px);opacity:.42}
+.hero h1,.hero .badge{text-shadow:0 2px 28px rgba(6,40,74,.6)}
+@media (prefers-reduced-motion:reduce){.hero canvas.globe{transition:none}}
 .hero canvas.globe{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .hero .in{position:relative;max-width:900px}
 .hero .lead{margin:18px auto 0;max-width:560px;color:var(--mist);font-size:17px}
@@ -547,8 +551,8 @@ function frame(ts){if(start===null)start=ts;let raw=(ts-start)/1000;let el=raw<=
   const T0=.1;                                   // 모두 같은 순간에 출발
   mx+=(tx-mx)*.05;my+=(ty-my)*.05;
   c.clearRect(0,0,W,H);drawBg(raw);
-  const inb=document.querySelector('.hero .in'),hb=cv.parentElement.getBoundingClientRect(),top=inb?inb.getBoundingClientRect().top-hb.top:H*.55;
-  const avail=Math.max(120,top-30),R=Math.min(mobile?Math.min(W,H)*.32:W*.14,avail*(mobile?.42:.38)),cx=W/2,cy=Math.max(R+16,avail/2+6),rot=el*.6+mx*2.2,tilt=.35+my;
+  let R=Math.min(W*.30,H*.46),cx=W/2,cy=H*.5;if(mobile){R=Math.min(W,H)*.46;}
+  const rot=el*.6+mx*2.2,tilt=.35+my;
   const ct=Math.cos(tilt),st=Math.sin(tilt);
   // 붙은 비율 → 구의 크기 (파티클만으로 자란다)
   const g=lg((el-T0-.5)/1.6),Rg=R*(.06+.94*g),ba=Math.max(0,Math.min(1,(g-.9)/.1));
@@ -572,7 +576,7 @@ function frame(ts){if(start===null)start=ts;let raw=(ts-start)/1000;let el=raw<=
       if(tw<0){const [X,Y,dep]=orbitPos(p.lat,phase,r0*.9);const al=.3+.6*dep;drawDot(X,Y,.5+.6*dep,`rgba(255,255,255,${al})`);continue;}
       if(wordFade<=0)continue;const mw=Math.min(1,tw/.5),u=1-mw;
       if(!p.sx){const [X,Y]=orbitPos(p.lat,phase,r0*.9);p.sx=X;p.sy=Y;}
-      const mxp=(p.sx+q.x)/2+ (q.x-p.sx)*.1, myp=Math.min(p.sy,q.y)-R*.25;   // 살짝 위로 휘어 날아간다
+      const mxp=(p.sx+q.x)/2, myp=(p.sy+q.y)/2;   // 살짝 위로 휘어 날아간다
       const X=u*u*p.sx+2*u*mw*mxp+mw*mw*q.x,Y=u*u*p.sy+2*u*mw*myp+mw*mw*q.y;
       drawDot(X,Y,.8+.4*mw,`rgba(159,212,255,${(.6+.4*mw)*wordFade})`);continue;}
     // 구를 만드는 파티클: 돌면서 반지름이 줄어 붙는다
