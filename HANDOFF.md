@@ -40,10 +40,10 @@
 5 하루 체험 (손으로 풀기 → 결과 메시지 → 보관한 문제)
 6 선생님
 7 다음 학년 준비 진단 (7→8만 열림)
-8 FAQ 24개 (4묶음)
+8 FAQ 10개
 9 시작하기
 
-FAQ는 CMC Education 사이트가 답하는 학부모 질문 30개를 기준으로 24개로 맞췄다. 대응표는 `notes/parent-questions.md`.
+FAQ는 CMC Education 사이트가 답하는 학부모 질문 30개를 기준으로 골랐고, Moses 요청으로 10개로 합쳤다. 대응표는 `notes/parent-questions.md`.
 
 ## Moses에게 아직 받아야 하는 것
 - 다음 날 아침 메시지를 받는 사람이 학생인지 부모인지
