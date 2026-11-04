@@ -44,9 +44,9 @@ header .wrap{display:flex;align-items:center;gap:10px;padding-block:14px}
 /* 라벨·제목: 대문자 자간 라벨, 흰 Inter 500 제목 */
 .badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mist);line-height:1.3}
 .badge span{color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0}
-h1{margin:18px 0 0;font-weight:500;font-size:44px;line-height:1;letter-spacing:-.04em;color:#06284a;text-wrap:balance}
-html[data-lang="ko"] h1{font-size:40px;letter-spacing:-.03em;line-height:1.1}
-@media (min-width:760px){h1{font-size:72px;letter-spacing:-.046em}html[data-lang="ko"] h1{font-size:64px;letter-spacing:-.035em}}
+h1{margin:18px 0 0;font-weight:500;font-size:52px;line-height:.98;letter-spacing:-.045em;color:#06284a;text-wrap:balance}
+html[data-lang="ko"] h1{font-size:46px;letter-spacing:-.03em;line-height:1.1}
+@media (min-width:760px){h1{font-size:96px;letter-spacing:-.05em}html[data-lang="ko"] h1{font-size:84px;letter-spacing:-.035em}}
 h1 em{font-style:normal;color:#0b63c7}
 h2{margin:16px 0 0;font-weight:500;font-size:32px;line-height:1.02;letter-spacing:-.04em;color:#06284a;text-wrap:balance}
 html[data-lang="ko"] h2{font-size:28px;letter-spacing:-.025em;line-height:1.15}
@@ -64,7 +64,7 @@ h3{margin:0;font-weight:500;font-size:20px;line-height:1.3;letter-spacing:-.02em
 @media (min-width:760px){.fcard{padding:36px}}
 
 /* 첫 화면: 파도 → 지구 */
-.hero{position:relative;min-height:calc(100svh - 64px);display:grid;place-items:end center;text-align:center;padding-block:0 6vh;overflow:hidden}
+.hero{position:relative;min-height:calc(100svh - 64px);display:grid;place-items:end center;text-align:center;padding-block:0 9vh;overflow:hidden}
 .hero canvas.globe{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .hero .in{position:relative;max-width:900px}
 .hero .lead{margin:18px auto 0;max-width:560px;color:var(--silver);font-size:17px}
@@ -536,7 +536,7 @@ function frame(ts){if(start===null)start=ts;let raw=(ts-start)/1000;let el=raw<=
   mx+=(tx-mx)*.05;my+=(ty-my)*.05;
   c.clearRect(0,0,W,H);drawBg(raw);
   const inb=document.querySelector('.hero .in'),hb=cv.parentElement.getBoundingClientRect(),top=inb?inb.getBoundingClientRect().top-hb.top:H*.55;
-  const avail=Math.max(120,top-30),R=Math.min(mobile?Math.min(W,H)*.40:W*.19,avail*(mobile?.47:.42)),cx=W/2,cy=Math.max(R+16,avail/2+6),rot=el*.6+mx*2.2,tilt=.35+my;
+  const avail=Math.max(120,top-30),R=Math.min(mobile?Math.min(W,H)*.32:W*.14,avail*(mobile?.42:.38)),cx=W/2,cy=Math.max(R+16,avail/2+6),rot=el*.6+mx*2.2,tilt=.35+my;
   const ct=Math.cos(tilt),st=Math.sin(tilt);
   // 붙은 비율 → 구의 크기 (파티클만으로 자란다)
   const g=lg((el-T0-.5)/1.6),Rg=R*(.06+.94*g),ba=Math.max(0,Math.min(1,(g-.9)/.1));
