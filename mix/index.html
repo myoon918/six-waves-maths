@@ -65,6 +65,7 @@ h3{margin:0;font-weight:500;font-size:20px;line-height:1.3;letter-spacing:-.02em
 
 /* 첫 화면: 파도 → 지구 */
 .hero{position:relative;min-height:calc(100vh - 64px);min-height:calc(100lvh - 64px);display:grid;place-items:center;text-align:center;padding-block:4vh;overflow:hidden}
+@media (max-width:759px){.hero{place-items:start center;padding-block:13vh 7vh}.hero .ctas{margin-top:17vh;gap:14px;flex-direction:column;align-items:center}.hero .ctas .pill.big{margin-top:12px}}
 .hero canvas.globe{opacity:.6;transition:filter 3.2s ease .7s,opacity 3.2s ease .7s}
 .hero.in canvas.globe{filter:blur(3px);opacity:.42}
 .hero h1,.hero .badge{text-shadow:0 2px 28px rgba(6,40,74,.6)}
@@ -555,7 +556,7 @@ function frame(ts){if(start===null)start=ts;let raw=(ts-start)/1000;let el=raw<=
   const T0=.1;                                   // 모두 같은 순간에 출발
   mx+=(tx-mx)*.05;my+=(ty-my)*.05;
   c.clearRect(0,0,W,H);drawBg(raw);
-  let R=Math.min(W*.30,H*.46),cx=W/2,cy=H*.5;if(mobile){R=Math.min(W,H)*.46;}
+  let R=Math.min(W*.30,H*.46),cx=W/2,cy=H*.5;if(mobile){R=Math.min(W,H)*.44;const h1=document.querySelector('.hero h1'),hb=cv.parentElement.getBoundingClientRect();if(h1){const r=h1.getBoundingClientRect();cy=Math.max(R*.78,r.top-hb.top+r.height*.5);}}
   const rot=el*.3+mx*2.2,tilt=.35+my;
   const ct=Math.cos(tilt),st=Math.sin(tilt);
   // 붙은 비율 → 구의 크기 (파티클만으로 자란다)
