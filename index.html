@@ -523,7 +523,7 @@ function buildWord(){wp=[];for(const p of surf){p.word=-1;p.sx=0;}const em=[...d
   wp.sort((a,b)=>a.x-b.x||a.y-b.y);                                   // 왼쪽 글자부터 쓰이도록
   const minx=wp.length?wp[0].x:0,maxx=wp.length?wp[wp.length-1].x:1;
   const cand=surf.filter(p=>p.kind===0);const stepi=Math.max(1,Math.floor(cand.length/Math.max(1,wp.length)));
-  for(let k=0,j=0;k<wp.length&&j<cand.length;k++,j+=stepi){cand[j].word=k;cand[j].sx=0;cand[j].wdelay=.6+((wp[k].x-minx)/Math.max(1,maxx-minx))*.75+Math.random()*.1;}}
+  for(let k=0,j=0;k<wp.length&&j<cand.length;k++,j+=stepi){cand[j].word=k;cand[j].sx=0;cand[j].wdelay=.5+((wp[k].x-minx)/Math.max(1,maxx-minx))*.95+Math.random()*.1;}}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(buildWord,50));else setTimeout(buildWord,300);
 addEventListener('resize',()=>{buildWord();});
 const _lb=document.getElementById('langbtn');if(_lb)_lb.addEventListener('click',()=>setTimeout(buildWord,80));
@@ -539,14 +539,14 @@ function frame(ts){if(start===null)start=ts;let raw=(ts-start)/1000;let el=raw<=
   const avail=Math.max(120,top-30),R=Math.min(mobile?Math.min(W,H)*.32:W*.14,avail*(mobile?.42:.38)),cx=W/2,cy=Math.max(R+16,avail/2+6),rot=el*.3+mx*2.2,tilt=.35+my;
   const ct=Math.cos(tilt),st=Math.sin(tilt);
   // 붙은 비율 → 구의 크기 (파티클만으로 자란다)
-  const g=lg((el-T0-.5)/1.6),Rg=R*(.06+.94*g),ba=Math.max(0,Math.min(1,(g-.92)/.08));
+  const g=lg((el-T0-.5)/1.6),Rg=R*(.06+.94*g),ba=Math.max(0,Math.min(1,(g-.94)/.06));
   if(ba>0){ const h=c.createRadialGradient(cx,cy,R*.6,cx,cy,R*1.9);h.addColorStop(0,`rgba(60,150,255,${.27*ba})`);h.addColorStop(.35,`rgba(90,175,255,${.151*ba})`);h.addColorStop(.7,`rgba(150,205,255,${.05*ba})`);h.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=h;c.fillRect(0,0,W,H); const g2=c.createRadialGradient(cx-R*.4,cy-R*.4,R*.05,cx,cy,R);g2.addColorStop(0,`rgba(120,190,255,${ba})`);g2.addColorStop(.5,`rgba(22,96,190,${ba})`);g2.addColorStop(1,`rgba(5,30,80,${ba})`);c.fillStyle=g2;c.beginPath();c.arc(cx,cy,R,0,Math.PI*2);c.fill(); }
   // 파도 위 출발 위치 (출발 순간에 고정)
   const waveXY=(t,row,jit)=>{const wx=t*W,amp=H*.035,wy=H*(.16+row*.09)+Math.sin(t*12.57+row*.9)*amp+(jit||0);return [wx,wy];};
   // 한 방향 이동: 출발점 → 축 둘레 궤도 진입점. f=0..1 (0.45초). 이동하는 동안 무리 전체가 같은 속도로 쓸려 간다
   // 축 회전: 진입 뒤 세로축(기울어진) 둘레를 각속도 ω 로 돌며, 반지름이 r0 → Rg 로 줄어 붙는다
   const orbitPos=(lat,phase,r)=>{const x=r*Math.cos(lat)*Math.cos(phase),y=r*Math.sin(lat),z=r*Math.cos(lat)*Math.sin(phase);const y2=y*ct-z*st,z2=y*st+z*ct;return [cx+x,cy-y2,(z2/Math.max(r,1)+1)/2];};
-  const wordFade=el>2.0?Math.max(0,1-(el-2.0)/.45):1;
+  const wordFade=el>2.1?Math.max(0,1-(el-2.1)/.45):1;
   const drawDot=(X,Y,sz,style)=>{c.fillStyle=style;c.beginPath();c.arc(X,Y,sz,0,Math.PI*2);c.fill();};
   for(const p of surf){
     const [wx,wy]=waveXY(p.t,p.row,p.jit);
@@ -558,7 +558,7 @@ function frame(ts){if(start===null)start=ts;let raw=(ts-start)/1000;let el=raw<=
     if(p.word>=0){ // 글씨 쓰는 파티클: 붙지 않고 돌다가, 자기 차례에 한 방향으로 날아가 글자를 채운다
       const q=wp[p.word];const tw=el-p.wdelay;
       if(tw<0){const [X,Y,dep]=orbitPos(p.lat,phase,r0*.9);const al=.3+.6*dep;drawDot(X,Y,.5+.6*dep,`rgba(11,99,199,${al})`);continue;}
-      if(wordFade<=0)continue;const mw=Math.min(1,tw/.45),u=1-mw;
+      if(wordFade<=0)continue;const mw=Math.min(1,tw/.5),u=1-mw;
       if(!p.sx){const [X,Y]=orbitPos(p.lat,phase,r0*.9);p.sx=X;p.sy=Y;}
       const mxp=(p.sx+q.x)/2+ (q.x-p.sx)*.1, myp=Math.min(p.sy,q.y)-R*.25;   // 살짝 위로 휘어 날아간다
       const X=u*u*p.sx+2*u*mw*mxp+mw*mw*q.x,Y=u*u*p.sy+2*u*mw*myp+mw*mw*q.y;
@@ -581,7 +581,7 @@ function frame(ts){if(start===null)start=ts;let raw=(ts-start)/1000;let el=raw<=
     if(mi>=1){let x=Math.cos(lat)*Math.cos(lon),z=Math.cos(lat)*Math.sin(lon),y=Math.sin(lat);const y2=y*ct-z*st,z2=y*st+z*ct;if(z2<=0)continue;const d=(z2+1)/2;drawDot(cx+x*Rg,cy-y2*Rg,.6+.9*d,`rgba(255,255,255,${(.35+.55*d)*.95})`);}
     else{const r=r0+(Rg-r0)*mi;const [X,Y,dep]=orbitPos(lat,lon,r);const al=.35+.55*dep;drawDot(X,Y,.6+.9*dep,`rgba(11,99,199,${al})`);}
   }
-  if(!wordShown&&el>(wp.length?1.9:1.9)){wordShown=true;cv.parentElement.classList.add('word');}
+  if(!wordShown&&el>(wp.length?2.0:1.9)){wordShown=true;cv.parentElement.classList.add('word');}
   if(running||el<4)requestAnimationFrame(frame);else setTimeout(()=>requestAnimationFrame(frame),400);}
 requestAnimationFrame(frame);
 })();
