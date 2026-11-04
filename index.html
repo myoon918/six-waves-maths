@@ -504,16 +504,16 @@ const N=mobile?4500:9000,surf=[];
 for(let i=0;i<N;i++){const lat=Math.asin(Math.random()*2-1),lon=Math.random()*Math.PI*2;
   const cur=fbm(Math.cos(lon)*1.6+2,Math.sin(lon)*1.6+lat*2.2),cl=fbm(lon*.9+9,lat*3+4);
   let kind=0;if(cl>.28)kind=2;else if(cur>.12)kind=1; // 0 바다 1 밝은 해류 2 구름
-  surf.push({lat,lon,kind,s:Math.random(),t:Math.random(),row:i%6,jit:(Math.random()-.5)*10,delay:.3+Math.random()*.9,dur:.9+Math.random()*.5,turns:.8+Math.random()*.8,word:-1,wdelay:0,depLon:0,depLat:0});}
+  surf.push({lat,lon,kind,s:Math.random(),t:Math.random(),row:i%6,jit:(Math.random()-.5)*10,delay:Math.random()*1.1,dur:.5+Math.random()*.5,word:-1,wdelay:0,sx:0,sy:0});}
 // 여섯 줄 물결: 모이기 전엔 화면 파도, 모인 뒤엔 구 위를 도는 흰 띠
 const M=mobile?1400:2600,wav=[];
-for(let i=0;i<M;i++){const row=i%6;wav.push({t:Math.random(),row,lat:(row-2.5)*.42+ (Math.random()-.5)*.08,sp:.25+Math.random()*.15,ph:Math.random()*6.28,delay:.3+Math.random()*.9,dur:.9+Math.random()*.5,turns:.8+Math.random()*.8});}
+for(let i=0;i<M;i++){const row=i%6;wav.push({t:Math.random(),row,lat:(row-2.5)*.42+ (Math.random()-.5)*.08,sp:.25+Math.random()*.15,ph:Math.random()*6.28,delay:.2+Math.random()*1.0,dur:.5+Math.random()*.5});}
 // 배경 파도: 크고 작은 선들. 화면 전체에, 아주 옅게
 const BG=[];for(let i=0;i<18;i++){BG.push({y:.04+i*.053+(Math.random()-.5)*.03,amp:6+Math.random()*34,len:220+Math.random()*800,sp:(.2+Math.random()*.5)*(i%2?1:-1),w:.6+Math.random()*1.6,a:.04+Math.random()*.09,ph:Math.random()*6.28});}
 function drawBg(el){for(const b of BG){c.beginPath();for(let x=-20;x<=W+20;x+=8){const y=H*b.y+Math.sin((x/b.len)*6.283+el*b.sp+b.ph)*b.amp+Math.sin((x/(b.len*.37))*6.283-el*b.sp*1.7)*b.amp*.25;x===-20?c.moveTo(x,y):c.lineTo(x,y);}c.strokeStyle=`rgba(11,99,199,${b.a*1.6})`;c.lineWidth=b.w;c.stroke();}}
 // 강조 단어("succeed" / "해내게"): 글자 모양을 보이지 않는 캔버스에 그려 점으로 뽑고, 구를 만든 점들 일부에 그 자리를 배정한다
 let wp=[],wordBox=null,wordShown=false;
-function buildWord(){wp=[];for(const p of surf){p.word=-1;}const em=[...document.querySelectorAll('.hero h1 em')].find(e=>e.getClientRects().length);if(!em)return;
+function buildWord(){wp=[];for(const p of surf){p.word=-1;p.sx=0;}const em=[...document.querySelectorAll('.hero h1 em')].find(e=>e.getClientRects().length);if(!em)return;
   const r=em.getBoundingClientRect(),hb=cv.getBoundingClientRect();if(r.width<10)return;
   const cs=getComputedStyle(em);const off=document.createElement('canvas');off.width=Math.ceil(r.width)+8;off.height=Math.ceil(r.height)+8;const o=off.getContext('2d');
   o.font=cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily;o.textBaseline='alphabetic';o.fillStyle='#000';
@@ -521,8 +521,10 @@ function buildWord(){wp=[];for(const p of surf){p.word=-1;}const em=[...document
   const d=o.getImageData(0,0,off.width,off.height).data,step=mobile?2.4:2.8;
   for(let y=0;y<off.height;y+=step)for(let x=0;x<off.width;x+=step){const i=(Math.floor(y)*off.width+Math.floor(x))*4+3;if(d[i]>120)wp.push({x:r.left-hb.left-4+x,y:r.top-hb.top-4+y});}
   wordBox={cx:r.left-hb.left+r.width/2,cy:r.top-hb.top+r.height/2};
+  wp.sort((a,b)=>a.x-b.x||a.y-b.y);                                   // 왼쪽 글자부터 쓰이도록
+  const minx=wp.length?wp[0].x:0,maxx=wp.length?wp[wp.length-1].x:1;
   const cand=surf.filter(p=>p.kind===0);const stepi=Math.max(1,Math.floor(cand.length/Math.max(1,wp.length)));
-  for(let k=0,j=0;k<wp.length&&j<cand.length;k++,j+=stepi){cand[j].word=k;cand[j].wdelay=2.3+Math.random()*.6;cand[j].depLon=0;}}
+  for(let k=0,j=0;k<wp.length&&j<cand.length;k++,j+=stepi){cand[j].word=k;cand[j].sx=0;cand[j].wdelay=2.0+((wp[k].x-minx)/Math.max(1,maxx-minx))*1.6+Math.random()*.15;}}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(buildWord,50));else setTimeout(buildWord,300);
 addEventListener('resize',()=>{buildWord();});
 const _lb=document.getElementById('langbtn');if(_lb)_lb.addEventListener('click',()=>setTimeout(buildWord,80));
@@ -530,52 +532,57 @@ let start=null,mx=0,my=0,tx=0,ty=0;addEventListener('pointermove',e=>{tx=(e.clie
 const ease=x=>x<.5?16*x*x*x*x*x:1-Math.pow(-2*x+2,5)/2;
 let running=true;new IntersectionObserver(es=>{running=es[0].isIntersecting},{threshold:0}).observe(cv);
 function frame(ts){if(start===null)start=ts;let el=(ts-start)/1000;if(still)el=Math.max(el,5);
-  // 진행 곡선은 로그 모양: 처음에 빠르게, 끝으로 갈수록 천천히
   const lg=x=>Math.log1p(9*Math.min(1,Math.max(0,x)))/Math.log1p(9);
-  const g=lg((el-.3)/1.9);                       // 구를 이루는 파티클이 얼마나 모였나 (0→1)
-  const fadeIn=Math.min(1,el/.2);mx+=(tx-mx)*.05;my+=(ty-my)*.05;
+  const T0=.1;                                   // 모두 같은 순간에 출발
+  mx+=(tx-mx)*.05;my+=(ty-my)*.05;
   c.clearRect(0,0,W,H);drawBg(el);
   const inb=document.querySelector('.hero .in'),hb=cv.parentElement.getBoundingClientRect(),top=inb?inb.getBoundingClientRect().top-hb.top:H*.55;
-  const avail=Math.max(120,top-40),R=Math.min(mobile?Math.min(W,H)*.27:W*.19,avail*.42),cx=W/2,cy=Math.max(R+20,avail/2+10),rot=el*.35+mx*2.2,tilt=.35+my;
-  // 구는 아무것도 없는 데서 파티클만으로 만들어지며 점점 커진다. 몸체·발광은 거의 다 모인 뒤에만 살짝
-  const Rg=R*(.05+.95*g),ba=Math.max(0,Math.min(1,(g-.9)/.1));
+  const avail=Math.max(120,top-40),R=Math.min(mobile?Math.min(W,H)*.27:W*.19,avail*.42),cx=W/2,cy=Math.max(R+20,avail/2+10),rot=el*.6+mx*2.2,tilt=.35+my;
   const ct=Math.cos(tilt),st=Math.sin(tilt);
+  // 붙은 비율 → 구의 크기 (파티클만으로 자란다)
+  const g=lg((el-T0-.5)/1.6),Rg=R*(.06+.94*g),ba=Math.max(0,Math.min(1,(g-.9)/.1));
   if(ba>0){ const h=c.createRadialGradient(cx,cy,R*.6,cx,cy,R*1.9);h.addColorStop(0,`rgba(60,150,255,${.27*ba})`);h.addColorStop(.35,`rgba(90,175,255,${.151*ba})`);h.addColorStop(.7,`rgba(150,205,255,${.05*ba})`);h.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=h;c.fillRect(0,0,W,H); const g2=c.createRadialGradient(cx-R*.4,cy-R*.4,R*.05,cx,cy,R);g2.addColorStop(0,`rgba(120,190,255,${ba})`);g2.addColorStop(.5,`rgba(22,96,190,${ba})`);g2.addColorStop(1,`rgba(5,30,80,${ba})`);c.fillStyle=g2;c.beginPath();c.arc(cx,cy,R,0,Math.PI*2);c.fill(); }
-  // 파도 위 한 점의 화면 위치 (파도는 파티클 리본)
-  const waveXY=(t,row,jit)=>{const sp=el*.08;const wx=((t+sp)%1)*W,amp=H*.035,wy=H*(.16+row*.09)+Math.sin(t*12.57+el*1.6+row*.9)*amp+(jit||0);return [wx,wy];};
-  // 3D 공전: 화면 위 출발점에서 구 위 목표(lat1,lon1)까지, 구 중심을 축으로 돌면서(turns 바퀴) 반지름이 줄어들며 붙는다. 반환: [X,Y,깊이]
-  const orbit=(wx,wy,lat1,lon1,mi,turns)=>{const dx=wx-cx,dy=-(wy-cy)/ct,r0=Math.hypot(dx,dy)||1;const lat0=Math.asin(Math.max(-1,Math.min(1,dy/r0))),lon0=dx>=0?0:Math.PI;
-    let dl=((lon1-lon0+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;const lat=lat0+(lat1-lat0)*mi,lon=lon0+dl*mi+(1-mi)*mi*4*turns*6.283,r=r0+(Rg-r0)*mi;
-    const x=r*Math.cos(lat)*Math.cos(lon),y=r*Math.sin(lat),z=r*Math.cos(lat)*Math.sin(lon);const y2=y*ct-z*st,z2=y*st+z*ct;return [cx+x,cy-y2,(z2/Math.max(r,1)+1)/2];};
-  const wordFade=el>4.0?Math.max(0,1-(el-4.0)/.5):1;
-  // 표면 점: 파도 리본 → 3D 공전하며 구에 붙음 (구가 커지면 자리도 같이 커진다) → 일부는 구에서 날아가 단어가 된다
-  for(const p of surf){const lon1=p.lon+rot;let x=Math.cos(p.lat)*Math.cos(lon1),z=Math.cos(p.lat)*Math.sin(lon1),y=Math.sin(p.lat);
-    const y2=y*ct-z*st,z2=y*st+z*ct,gx=cx+x*Rg,gy=cy-y2*Rg,d=(z2+1)/2,lit=.35+.65*Math.max(0,(x*-.55+y2*-.55+z2*.62));
-    const mi=lg((el-p.delay)/p.dur);
-    if(p.word>=0&&el>p.wdelay&&wordBox){ // 구를 만들었던 점이 떠나 단어의 한 점이 된다: 바깥으로 튕겨 나갔다가 휘어져 글자 자리로
-      if(wordFade<=0)continue;if(!p.depLon){p.depLon=lon1;p.depLat=p.lat;}
-      const mw=lg((el-p.wdelay)/.8),q=wp[p.word];
-      const lx=Math.cos(p.depLat)*Math.cos(p.depLon),ly=Math.sin(p.depLat),lz=Math.cos(p.depLat)*Math.sin(p.depLon);const ly2=ly*ct-lz*st;
-      const sx=cx+lx*R,sy=cy-ly2*R,ex=cx+lx*R*1.5,ey=cy-ly2*R*1.5;          // 출발점과 바깥으로 튕긴 점
-      const t2=mw,u=1-t2,X=u*u*sx+2*u*t2*ex+t2*t2*q.x,Y=u*u*sy+2*u*t2*ey+t2*t2*q.y;
-      c.fillStyle=`rgba(11,99,199,${(.6+.4*mw)*wordFade})`;c.beginPath();c.arc(X,Y,.8+.5*mw,0,Math.PI*2);c.fill();continue;}
-    if(mi>=1){if(z2<0.02)continue;
-      if(p.kind===2)c.fillStyle=`rgba(255,255,255,${(.45+.5*lit)*d})`;else if(p.kind===1)c.fillStyle=`rgba(170,230,255,${(.35+.5*lit)*d})`;else c.fillStyle=`rgba(10,70,170,${(.35+.45*lit)*d})`;
-      c.beginPath();c.arc(gx,gy,(p.kind===2?1.0:.75)+.8*d,0,Math.PI*2);c.fill();}
-    else{ const [wx,wy]=waveXY(p.t,p.row,p.jit);let X,Y,dep=.85;if(mi<=0){X=wx;Y=wy;}else{[X,Y,dep]=orbit(wx,wy,p.lat,lon1,mi,p.turns);}
-      const al=(.3+.6*dep)*fadeIn;
-      c.fillStyle=`rgba(11,99,199,${al})`;c.beginPath();c.arc(X,Y,.6+.7*dep,0,Math.PI*2);c.fill();}}
-  // 여섯 줄 물결: 같은 리본에서 출발해 3D 로 공전하다 구 표면의 띠로 남는다
+  // 파도 위 출발 위치 (출발 순간에 고정)
+  const waveXY=(t,row,jit)=>{const wx=t*W,amp=H*.035,wy=H*(.16+row*.09)+Math.sin(t*12.57+row*.9)*amp+(jit||0);return [wx,wy];};
+  // 한 방향 이동: 출발점 → 축 둘레 궤도 진입점. f=0..1 (0.45초). 이동하는 동안 무리 전체가 같은 속도로 쓸려 간다
+  // 축 회전: 진입 뒤 세로축(기울어진) 둘레를 각속도 ω 로 돌며, 반지름이 r0 → Rg 로 줄어 붙는다
+  const orbitPos=(lat,phase,r)=>{const x=r*Math.cos(lat)*Math.cos(phase),y=r*Math.sin(lat),z=r*Math.cos(lat)*Math.sin(phase);const y2=y*ct-z*st,z2=y*st+z*ct;return [cx+x,cy-y2,(z2/Math.max(r,1)+1)/2];};
+  const wordFade=el>4.6?Math.max(0,1-(el-4.6)/.5):1;
+  const drawDot=(X,Y,sz,style)=>{c.fillStyle=style;c.beginPath();c.arc(X,Y,sz,0,Math.PI*2);c.fill();};
+  for(const p of surf){
+    const [wx,wy]=waveXY(p.t,p.row,p.jit);
+    const r0=R*(1.9+p.s*.9), ent=orbitPos(p.lat,p.lon,r0);           // 궤도 진입점 (구보다 넓은 반지름)
+    const f=Math.min(1,Math.max(0,(el-T0)/.45));                      // 이동 구간
+    if(f<1){ const ff=f*f*(3-2*f),X=wx+(ent[0]-wx)*ff,Y=wy+(ent[1]-wy)*ff,al=.75*Math.min(1,el/.15);drawDot(X,Y,.75,`rgba(11,99,199,${al})`);continue;}
+    const te=el-T0-.45;                                                // 궤도에 들어온 뒤 시간
+    const phase=p.lon+rot*1.6+te*2.2;                                  // 같은 축으로 함께 돈다
+    if(p.word>=0){ // 글씨 쓰는 파티클: 붙지 않고 돌다가, 자기 차례에 한 방향으로 날아가 글자를 채운다
+      const q=wp[p.word];const tw=el-p.wdelay;
+      if(tw<0){const [X,Y,dep]=orbitPos(p.lat,phase,r0*.9);const al=.3+.6*dep;drawDot(X,Y,.5+.6*dep,`rgba(11,99,199,${al})`);continue;}
+      if(wordFade<=0)continue;const mw=Math.min(1,tw/.5),u=1-mw;
+      if(!p.sx){const [X,Y]=orbitPos(p.lat,phase,r0*.9);p.sx=X;p.sy=Y;}
+      const mxp=(p.sx+q.x)/2+ (q.x-p.sx)*.1, myp=Math.min(p.sy,q.y)-R*.25;   // 살짝 위로 휘어 날아간다
+      const X=u*u*p.sx+2*u*mw*mxp+mw*mw*q.x,Y=u*u*p.sy+2*u*mw*myp+mw*mw*q.y;
+      drawDot(X,Y,.8+.4*mw,`rgba(11,99,199,${(.6+.4*mw)*wordFade})`);continue;}
+    // 구를 만드는 파티클: 돌면서 반지름이 줄어 붙는다
+    const mi=lg((te-p.delay)/p.dur);
+    if(mi>=1){const lon1=p.lon+rot;let x=Math.cos(p.lat)*Math.cos(lon1),z=Math.cos(p.lat)*Math.sin(lon1),y=Math.sin(p.lat);const y2=y*ct-z*st,z2=y*st+z*ct;if(z2<0.02)continue;
+      const d=(z2+1)/2,lit=.35+.65*Math.max(0,(x*-.55+y2*-.55+z2*.62));
+      const style=p.kind===2?`rgba(255,255,255,${(.45+.5*lit)*d})`:p.kind===1?`rgba(170,230,255,${(.35+.5*lit)*d})`:`rgba(10,70,170,${(.35+.45*lit)*d})`;
+      drawDot(cx+x*Rg,cy-y2*Rg,(p.kind===2?1.0:.75)+.8*d,style);}
+    else{const r=r0+(Rg-r0)*mi;const [X,Y,dep]=orbitPos(p.lat,phase,r);const al=(.3+.6*dep);drawDot(X,Y,.5+.7*dep,`rgba(11,99,199,${al})`);}
+  }
+  // 여섯 줄 물결 띠: 구 위 띠로 (같은 축 회전)
   for(const w of wav){
-    const mi=lg((el-w.delay)/w.dur);
+    const [wx,wy]=waveXY(w.t,w.row,0);const r0=R*2.2;const ent=orbitPos(w.lat,w.t*6.283,r0);
+    const f=Math.min(1,Math.max(0,(el-T0)/.45));
+    if(f<1){const ff=f*f*(3-2*f),al=.9*Math.min(1,el/.15);drawDot(wx+(ent[0]-wx)*ff,wy+(ent[1]-wy)*ff,.8,`rgba(11,99,199,${al})`);continue;}
+    const te=el-T0-.45,mi=lg((te-w.delay)/w.dur);
     const lon=w.t*6.283+el*w.sp*2+rot,lat=w.lat+Math.sin(lon*3+w.ph)*.05;
-    let x=Math.cos(lat)*Math.cos(lon),z=Math.cos(lat)*Math.sin(lon),y=Math.sin(lat);const y2=y*ct-z*st,z2=y*st+z*ct;
-    const gx=cx+x*Rg,gy=cy-y2*Rg;
-    if(mi>=1&&z2<=0)continue;
-    const [wx,wy]=waveXY(w.t,w.row,0);let X,Y,dep=.85;if(mi>=1){X=gx;Y=gy;dep=(z2+1)/2;}else if(mi<=0){X=wx;Y=wy;}else{[X,Y,dep]=orbit(wx,wy,lat,lon,mi,w.turns);}
-    const al=(.35+.55*dep)*fadeIn;
-    c.fillStyle=mi<1?`rgba(11,99,199,${al})`:`rgba(255,255,255,${al*.95})`;c.beginPath();c.arc(X,Y,.6+.9*dep,0,Math.PI*2);c.fill();}
-  if(!wordShown&&el>(wp.length?3.85:2.4)){wordShown=true;cv.parentElement.classList.add('word');}
+    if(mi>=1){let x=Math.cos(lat)*Math.cos(lon),z=Math.cos(lat)*Math.sin(lon),y=Math.sin(lat);const y2=y*ct-z*st,z2=y*st+z*ct;if(z2<=0)continue;const d=(z2+1)/2;drawDot(cx+x*Rg,cy-y2*Rg,.6+.9*d,`rgba(255,255,255,${(.35+.55*d)*.95})`);}
+    else{const r=r0+(Rg-r0)*mi;const [X,Y,dep]=orbitPos(lat,lon,r);const al=.35+.55*dep;drawDot(X,Y,.6+.9*dep,`rgba(11,99,199,${al})`);}
+  }
+  if(!wordShown&&el>(wp.length?4.4:2.6)){wordShown=true;cv.parentElement.classList.add('word');}
   if(running||el<4)requestAnimationFrame(frame);else setTimeout(()=>requestAnimationFrame(frame),400);}
 requestAnimationFrame(frame);
 })();
