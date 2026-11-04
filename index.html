@@ -539,7 +539,7 @@ function frame(ts){if(start===null)start=ts;let raw=(ts-start)/1000;let el=raw<=
   const avail=Math.max(120,top-30),R=Math.min(mobile?Math.min(W,H)*.32:W*.14,avail*(mobile?.42:.38)),cx=W/2,cy=Math.max(R+16,avail/2+6),rot=el*.3+mx*2.2,tilt=.35+my;
   const ct=Math.cos(tilt),st=Math.sin(tilt);
   // 붙은 비율 → 구의 크기 (파티클만으로 자란다)
-  const g=lg((el-T0-.5)/1.6),Rg=R*(.06+.94*g),ba=Math.max(0,Math.min(1,(el-4.5)/.15));
+  const g=lg((el-T0-.5)/1.6),Rg=R*(.06+.94*g),ba=Math.max(0,Math.min(1,(el-3.05)/.15));   // 구 몸체 번쩍. succeed 완성(4.5)보다 1초(실시간) 먼저
   if(ba>0){ const h=c.createRadialGradient(cx,cy,R*.6,cx,cy,R*1.9);h.addColorStop(0,`rgba(60,150,255,${.27*ba})`);h.addColorStop(.35,`rgba(90,175,255,${.151*ba})`);h.addColorStop(.7,`rgba(150,205,255,${.05*ba})`);h.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=h;c.fillRect(0,0,W,H); const g2=c.createRadialGradient(cx-R*.4,cy-R*.4,R*.05,cx,cy,R);g2.addColorStop(0,`rgba(120,190,255,${ba})`);g2.addColorStop(.5,`rgba(22,96,190,${ba})`);g2.addColorStop(1,`rgba(5,30,80,${ba})`);c.fillStyle=g2;c.beginPath();c.arc(cx,cy,R,0,Math.PI*2);c.fill(); }
   // 파도 위 출발 위치 (출발 순간에 고정)
   const waveXY=(t,row,jit)=>{const wx=t*W,amp=H*.035,wy=H*(.16+row*.09)+Math.sin(t*12.57+row*.9)*amp+(jit||0);return [wx,wy];};
