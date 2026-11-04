@@ -517,7 +517,7 @@ function frame(ts){if(start===null)start=ts;let el=(ts-start)/1000;if(still)el=M
   const inb=document.querySelector('.hero .in'),hb=cv.parentElement.getBoundingClientRect(),top=inb?inb.getBoundingClientRect().top-hb.top:H*.55;
   const avail=Math.max(120,top-40),R=Math.min(mobile?Math.min(W,H)*.27:W*.19,avail*.42),cx=W/2,cy=Math.max(R+20,avail/2+10),rot=el*.22+mx*2.2,tilt=.35+my;
   if(m>0){ // 몸체: 뒤에 강한 파란 발광, 그 위에 바다색 구
-    const h=c.createRadialGradient(cx,cy,R*.6,cx,cy,R*1.9);h.addColorStop(0,`rgba(60,150,255,${.225*m})`);h.addColorStop(.35,`rgba(90,175,255,${.126*m})`);h.addColorStop(.7,`rgba(150,205,255,${.042*m})`);h.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=h;c.fillRect(0,0,W,H);
+    const h=c.createRadialGradient(cx,cy,R*.6,cx,cy,R*1.9);h.addColorStop(0,`rgba(60,150,255,${.27*m})`);h.addColorStop(.35,`rgba(90,175,255,${.151*m})`);h.addColorStop(.7,`rgba(150,205,255,${.05*m})`);h.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=h;c.fillRect(0,0,W,H);
     const g=c.createRadialGradient(cx-R*.4,cy-R*.4,R*.05,cx,cy,R);g.addColorStop(0,`rgba(120,190,255,${m})`);g.addColorStop(.5,`rgba(22,96,190,${m})`);g.addColorStop(1,`rgba(5,30,80,${m})`);
     c.fillStyle=g;c.beginPath();c.arc(cx,cy,R*m,0,Math.PI*2);c.fill();
     // 표면 점
