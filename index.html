@@ -73,8 +73,9 @@ h3{margin:0;font-weight:500;font-size:20px;line-height:1.3;letter-spacing:-.02em
 .hero .badge,.hero h1,.hero .sub,.hero .ctas{opacity:0;transform:translateY(12px);transition:opacity 2.2s cubic-bezier(.25,.1,.25,1) .6s,transform 2.2s cubic-bezier(.25,.1,.25,1) .6s}
 .hero h1{transition-delay:.7s}.hero .sub{transition-delay:.9s}.hero .ctas{transition-delay:1.1s}
 .hero.in .badge,.hero.in h1,.hero.in .sub,.hero.in .ctas{opacity:1;transform:none}
-.hero h1 em{opacity:0;transition:opacity .5s ease}
-.hero.word h1 em{opacity:1}
+.hero h1 em{opacity:0;transition:opacity .25s ease}
+.hero.word h1 em{opacity:1;animation:wordFlash 1.1s ease-out}
+@keyframes wordFlash{0%{filter:brightness(2.4);text-shadow:0 0 18px rgba(74,163,240,1),0 0 46px rgba(74,163,240,.85),0 0 90px rgba(74,163,240,.5)}35%{filter:brightness(1.6);text-shadow:0 0 14px rgba(74,163,240,.8),0 0 36px rgba(74,163,240,.5)}100%{filter:brightness(1);text-shadow:none}}
 
 
 
