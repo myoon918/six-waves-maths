@@ -75,8 +75,8 @@ h3{margin:0;font-weight:500;font-size:20px;line-height:1.3;letter-spacing:-.02em
 .hero.in .badge,.hero.in h1,.hero.in .sub,.hero.in .ctas{opacity:1;transform:none}
 .hero h1 em{opacity:0;transition:opacity .5s ease}
 .hero.word h1 em{opacity:1}
-@media (prefers-reduced-motion:reduce){.hero h1 em{opacity:1;transition:none}}
-@media (prefers-reduced-motion:reduce){.hero .badge,.hero h1,.hero .sub,.hero .ctas{opacity:1;transform:none;transition:none}}
+
+@media (prefers-reduced-motion:reduce){.hero .badge,.hero h1,.hero .sub,.hero .ctas{transition-duration:1s;transition-delay:.4s}}
 
 /* 질문 칸 아래 아이패드 두 대 */
 .float{position:relative;height:700px;margin:40px auto 0;max-width:1000px;text-align:left}
@@ -490,7 +490,7 @@ details:hover{background:#e6f1fa}
 // 첫 화면: 흰 파도 여섯 줄 → 바다 지구 (배경 파도 무늬 포함)
 const cv=document.getElementById('globe'),c=cv.getContext('2d');let W,H,DPR=Math.min(2,devicePixelRatio||1);
 function size(){const r=cv.parentElement.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;c.setTransform(DPR,0,0,DPR,0,0);}size();addEventListener('resize',size);
-const mobile=innerWidth<700,still=matchMedia('(prefers-reduced-motion: reduce)').matches;if(still)cv.parentElement.classList.add('word');
+const mobile=innerWidth<700,still=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // 값 노이즈 (해류·구름 무늬)
 const P=new Uint8Array(512);for(let i=0;i<256;i++)P[i]=i;for(let i=255;i>0;i--){const j=Math.random()*(i+1)|0;[P[i],P[j]]=[P[j],P[i]];}for(let i=0;i<256;i++)P[256+i]=P[i];
 const fade=t=>t*t*t*(t*(t*6-15)+10),lerp=(a,b,t)=>a+t*(b-a);
@@ -527,10 +527,13 @@ function buildWord(){wp=[];for(const p of surf){p.word=-1;p.sx=0;}const em=[...d
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(buildWord,50));else setTimeout(buildWord,300);
 addEventListener('resize',()=>{buildWord();});
 const _lb=document.getElementById('langbtn');if(_lb)_lb.addEventListener('click',()=>setTimeout(buildWord,80));
-let start=null,mx=0,my=0,tx=0,ty=0;addEventListener('pointermove',e=>{tx=(e.clientX/W-.5)*.5;ty=(e.clientY/H-.5)*.35});
+let start=null,mx=0,my=0,tx=0,ty=0;
+function restartHero(){start=null;wordShown=false;for(const p of surf){p.sx=0;p.sy=0;}const h=cv.parentElement;h.classList.remove('word');h.classList.remove('in');requestAnimationFrame(()=>requestAnimationFrame(()=>h.classList.add('in')));}
+addEventListener('pageshow',e=>{if(e.persisted)restartHero();});
+let hiddenAtStart=document.hidden;document.addEventListener('visibilitychange',()=>{if(!document.hidden&&hiddenAtStart){hiddenAtStart=false;restartHero();}});addEventListener('pointermove',e=>{tx=(e.clientX/W-.5)*.5;ty=(e.clientY/H-.5)*.35});
 const ease=x=>x<.5?16*x*x*x*x*x:1-Math.pow(-2*x+2,5)/2;
 let running=true;new IntersectionObserver(es=>{running=es[0].isIntersecting},{threshold:0}).observe(cv);
-function frame(ts){if(start===null)start=ts;let raw=(ts-start)/1000;let el=raw<=0?0:1.5*raw*(1+.35*Math.exp(-raw*1.2));if(still)el=Math.max(el,6);
+function frame(ts){if(start===null)start=ts;let raw=(ts-start)/1000;let el=raw<=0?0:1.5*raw*(1+.35*Math.exp(-raw*1.2));if(still)el*=2;
   const lg=x=>Math.log1p(9*Math.min(1,Math.max(0,x)))/Math.log1p(9);
   const T0=.1;                                   // 모두 같은 순간에 출발
   mx+=(tx-mx)*.05;my+=(ty-my)*.05;
