@@ -43,6 +43,8 @@
 8 FAQ 15개
 9 시작하기
 
+FAQ는 CMC Education 사이트가 답하는 학부모 질문 30개를 기준으로 24개로 맞췄다. 대응표는 `notes/parent-questions.md`.
+
 ## Moses에게 아직 받아야 하는 것
 - 다음 날 아침 메시지를 받는 사람이 학생인지 부모인지
 - "Years 7–12" 표기 가능 여부
