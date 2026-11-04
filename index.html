@@ -501,7 +501,7 @@ const N=mobile?6000:13000,surf=[];
 for(let i=0;i<N;i++){const lat=Math.asin(Math.random()*2-1),lon=Math.random()*Math.PI*2;
   const cur=fbm(Math.cos(lon)*1.6+2,Math.sin(lon)*1.6+lat*2.2),cl=fbm(lon*.9+9,lat*3+4);
   let kind=0;if(cl>.28)kind=2;else if(cur>.12)kind=1; // 0 바다 1 밝은 해류 2 구름
-  surf.push({lat,lon,kind,s:Math.random()});}
+  surf.push({lat,lon,kind,s:Math.random(),t:Math.random(),row:i%6,delay:.05+Math.random()*1.5,dur:.8+Math.random()*.5});}
 // 여섯 줄 물결: 모이기 전엔 화면 파도, 모인 뒤엔 구 위를 도는 흰 띠
 const M=mobile?1400:2600,wav=[];
 for(let i=0;i<M;i++){const row=i%6;wav.push({t:Math.random(),row,lat:(row-2.5)*.42+ (Math.random()-.5)*.08,sp:.25+Math.random()*.15,ph:Math.random()*6.28});}
@@ -514,42 +514,38 @@ let running=true;new IntersectionObserver(es=>{running=es[0].isIntersecting},{th
 function frame(ts){if(start===null)start=ts;let el=(ts-start)/1000;if(still)el=Math.max(el,4);
     // 진행 곡선은 로그 모양: 처음에 빠르게, 끝으로 갈수록 천천히
   const lg=x=>Math.log1p(9*Math.min(1,Math.max(0,x)))/Math.log1p(9);
-  const g=lg((el-.05)/2.4);const m=g;const fadeIn=Math.min(1,el/.25); // g: 구의 성장(0→1). 파도 점은 각자 다른 시각에 감겨 들어온다mx+=(tx-mx)*.05;my+=(ty-my)*.05;
+  const g=lg((el-.05)/2.6);const m=g;const fadeIn=Math.min(1,el/.25); // g: 구의 성장(0→1). 파도 점은 각자 다른 시각에 감겨 들어온다mx+=(tx-mx)*.05;my+=(ty-my)*.05;
   c.clearRect(0,0,W,H);drawBg(el);
   const inb=document.querySelector('.hero .in'),hb=cv.parentElement.getBoundingClientRect(),top=inb?inb.getBoundingClientRect().top-hb.top:H*.55;
   const avail=Math.max(120,top-40),R=Math.min(mobile?Math.min(W,H)*.27:W*.19,avail*.42),cx=W/2,cy=Math.max(R+20,avail/2+10),rot=el*.22+mx*2.2,tilt=.35+my;
-  if(m>0){ // 몸체: 뒤에 강한 파란 발광, 그 위에 바다색 구
-    const h=c.createRadialGradient(cx,cy,R*.6,cx,cy,R*1.9);h.addColorStop(0,`rgba(60,150,255,${.27*m})`);h.addColorStop(.35,`rgba(90,175,255,${.151*m})`);h.addColorStop(.7,`rgba(150,205,255,${.05*m})`);h.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=h;c.fillRect(0,0,W,H);
-    const g=c.createRadialGradient(cx-R*.4,cy-R*.4,R*.05,cx,cy,R);g.addColorStop(0,`rgba(120,190,255,${m})`);g.addColorStop(.5,`rgba(22,96,190,${m})`);g.addColorStop(1,`rgba(5,30,80,${m})`);
-    c.fillStyle=g;c.beginPath();c.arc(cx,cy,R*m,0,Math.PI*2);c.fill();
-    // 표면 점
-    const ct=Math.cos(tilt),st=Math.sin(tilt);
-    for(const p of surf){const lon=p.lon+rot;let x=Math.cos(p.lat)*Math.cos(lon),z=Math.cos(p.lat)*Math.sin(lon),y=Math.sin(p.lat);
-      const y2=y*ct-z*st,z2=y*st+z*ct;if(z2<0.02)continue;
-      const d=z2,lit=.35+.65*Math.max(0,(x*-.55+y2*-.55+z2*.62));
-      const px=cx+x*R*m,py=cy-y2*R*m;
-      if(p.kind===2)c.fillStyle=`rgba(255,255,255,${(.45+.5*lit)*d*m})`;
-      else if(p.kind===1)c.fillStyle=`rgba(170,230,255,${(.35+.5*lit)*d*m})`;
-      else c.fillStyle=`rgba(10,70,170,${(.3+.4*lit)*d*m})`;
-      c.beginPath();c.arc(px,py,(p.kind===2?1.0:.75)+.8*d,0,Math.PI*2);c.fill();}
-  }
-  // 여섯 줄 물결
+  // 구는 처음부터 제 크기. 파티클이 감겨 들어와 쌓이면서 몸체가 서서히 드러난다 (작은 구가 커지는 것이 아님)
+  const ba=Math.max(0,Math.min(1,(g-.3)/.55)),ba2=Math.max(0,Math.min(1,(g-.15)/.6));
   const ct=Math.cos(tilt),st=Math.sin(tilt);
+  if(ba>0){ const h=c.createRadialGradient(cx,cy,R*.6,cx,cy,R*1.9);h.addColorStop(0,`rgba(60,150,255,${.27*ba})`);h.addColorStop(.35,`rgba(90,175,255,${.151*ba})`);h.addColorStop(.7,`rgba(150,205,255,${.05*ba})`);h.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=h;c.fillRect(0,0,W,H); const g2=c.createRadialGradient(cx-R*.4,cy-R*.4,R*.05,cx,cy,R);g2.addColorStop(0,`rgba(120,190,255,${ba})`);g2.addColorStop(.5,`rgba(22,96,190,${ba})`);g2.addColorStop(1,`rgba(5,30,80,${ba})`); c.fillStyle=g2;c.beginPath();c.arc(cx,cy,R,0,Math.PI*2);c.fill(); }
+  // 파도 위 한 점의 화면 위치
+  const waveXY=(t,row)=>{const sp=el*.08+g*.6;const wx=((t+sp)%1)*W,amp=H*.035*(1+g*1.2),wy=H*(.16+row*.09)+Math.sin(t*12.57+el*(1.6+g*6)+row*.9)*amp;return [wx,wy];};
+  // 파도에서 목표점까지 나선으로 감겨 들어가는 위치
+  const spiral=(wx,wy,gx,gy,mi)=>{const r0=Math.hypot(wx-cx,wy-cy),a0=Math.atan2(wy-cy,wx-cx),r1=Math.hypot(gx-cx,gy-cy),a1=Math.atan2(gy-cy,gx-cx);const r=r0+(r1-r0)*mi,ang=a0+(a1-a0)*mi+(1-mi)*mi*4*3.2;return [cx+Math.cos(ang)*r,cy+Math.sin(ang)*r];};
+  // 표면 점: 각자 파도에서 출발해 구 위 제자리로 감겨 들어온다
+  for(const p of surf){const lon=p.lon+rot;let x=Math.cos(p.lat)*Math.cos(lon),z=Math.cos(p.lat)*Math.sin(lon),y=Math.sin(p.lat);
+    const y2=y*ct-z*st,z2=y*st+z*ct,gx=cx+x*R,gy=cy-y2*R,d=(z2+1)/2,lit=.35+.65*Math.max(0,(x*-.55+y2*-.55+z2*.62));
+    const mi=lg((el-p.delay)/p.dur);
+    if(mi>=1){if(z2<0.02)continue;
+      if(p.kind===2)c.fillStyle=`rgba(255,255,255,${(.45+.5*lit)*d})`;else if(p.kind===1)c.fillStyle=`rgba(170,230,255,${(.35+.5*lit)*d})`;else c.fillStyle=`rgba(10,70,170,${(.3+.4*lit)*d*ba2})`;
+      c.beginPath();c.arc(gx,gy,(p.kind===2?1.0:.75)+.8*d,0,Math.PI*2);c.fill();}
+    else{ if(p.s>.55&&mi<=0)continue; // 출발 전엔 절반만 파도에 보임 (너무 빽빽하지 않게)
+      const [wx,wy]=waveXY(p.t,p.row);const [X,Y]=mi<=0?[wx,wy]:spiral(wx,wy,gx,gy,mi);const al=(.3+.5*(mi<=0?.6:1))*fadeIn*(z2<0.02&&mi>.85?(1-mi)/.15:1);
+      c.fillStyle=`rgba(11,99,199,${al})`;c.beginPath();c.arc(X,Y,.7+.6*mi,0,Math.PI*2);c.fill();}}
+  // 여섯 줄 물결: 모인 뒤 구 표면의 띠로 남는다
   for(const w of wav){
-    // 각자 도착 시각: 파도 위 위치와 줄에 따라 0.1~1.9초 사이에 출발, 1초 동안 감겨 들어온다
     const mi=lg((el-(.05+w.t*1.1+(w.row%3)*.12))/1.0);
-    const sp=el*.08+g*.6;const wx=((w.t+sp)%1)*W,amp=H*.035*(1+g*1.2),wy=H*(.16+w.row*.09)+Math.sin(w.t*12.57+el*(1.6+g*6)+w.row*.9)*amp;
     const lon=w.t*6.283+el*w.sp*2+rot,lat=w.lat+Math.sin(lon*3+w.ph)*.05;
     let x=Math.cos(lat)*Math.cos(lon),z=Math.cos(lat)*Math.sin(lon),y=Math.sin(lat);const y2=y*ct-z*st,z2=y*st+z*ct;
-    const Rg=R*Math.max(g,.05),gx=cx+x*Rg,gy=cy-y2*Rg;
-    if(mi>=1&&z2<=0)continue;                       // 다 감긴 뒤 뒷면은 안 보임
-    let X,Y;
-    if(mi>=1){X=gx;Y=gy;}
-    else{ // 솜사탕: 중심을 향해 나선으로 감겨 들어간다
-      const r0=Math.hypot(wx-cx,wy-cy),a0=Math.atan2(wy-cy,wx-cx),r1=Math.hypot(gx-cx,gy-cy),a1=Math.atan2(gy-cy,gx-cx);
-      const r=r0+(r1-r0)*mi,ang=a0+(a1-a0)*mi+(1-mi)*mi*4*3.2;X=cx+Math.cos(ang)*r;Y=cy+Math.sin(ang)*r;}
-    const d=mi<1?.85:(z2+1)/2;
-    c.fillStyle=mi<1?`rgba(11,99,199,${(.45+.5*d)*fadeIn})`:`rgba(255,255,255,${(.35+.55*d)*.95})`;c.beginPath();c.arc(X,Y,.7+.9*d,0,Math.PI*2);c.fill();}
+    const gx=cx+x*R,gy=cy-y2*R;
+    if(mi>=1&&z2<=0)continue;
+    const [wx,wy]=waveXY(w.t,w.row);const [X,Y]=mi>=1?[gx,gy]:(mi<=0?[wx,wy]:spiral(wx,wy,gx,gy,mi));
+    const d=mi<1?.85:(z2+1)/2,al=(.35+.55*d)*fadeIn;
+    c.fillStyle=mi<1?`rgba(11,99,199,${al})`:`rgba(255,255,255,${al*.95})`;c.beginPath();c.arc(X,Y,.7+.9*d,0,Math.PI*2);c.fill();}
   if(running||el<4)requestAnimationFrame(frame);else setTimeout(()=>requestAnimationFrame(frame),400);}
 requestAnimationFrame(frame);
 })();
