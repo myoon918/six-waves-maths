@@ -240,8 +240,7 @@ details:hover{background:#124a80}
 .kid .ex2.off{background:transparent;color:var(--dim);border:1px solid var(--line)}
 
 /* 섹션 자석 스크롤: 섹션 시작 근처에서 멈추면 그 시작에 붙는다 */
-html{scroll-snap-type:y proximity;scroll-padding-top:64px}
-section{scroll-snap-align:start}
+html{scroll-padding-top:64px}
 .fgroup{margin:30px 0 6px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}.fgroup:first-child{margin-top:0}
 @media (prefers-reduced-motion:reduce){.bridge{opacity:1;transform:none;transition:none}.bridge::after,.hero .cue::after{animation:none}}
 </style>
@@ -674,6 +673,17 @@ function refreshFb(){document.querySelectorAll('.fb').forEach(fb=>{if(fb.dataset
         [[ko?'걸린 시간':'Time taken',sec+(ko?'초':' s')],[ko?'멈춤':'Pauses',pauses.length+(ko?'번':'')+(pauses.length?' ('+pauses.map(p=>p.sec+'s').join(', ')+')':'')],[ko?'지운 획':'Erased strokes',erased+(ko?'개':'')+(erased?(ko?' · 회색으로 남음':' · shown in grey'):'')]].forEach(([k,v])=>{const sp=document.createElement('span');sp.textContent=k+' '+v;marks.appendChild(sp);});}}
     raf=requestAnimationFrame(frame);});
 })();
+
+// 섹션 자석: 스크롤이 멈추면 화면 높이 35% 안에 있는 섹션 시작으로 끌어간다
+(function(){const secs=[...document.querySelectorAll('section')];const head=()=>{const h=document.querySelector('header');return h?h.getBoundingClientRect().height:64};
+  let t=null,touching=false,busy=false;const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  addEventListener('touchstart',()=>{touching=true},{passive:true});addEventListener('touchend',()=>{touching=false;arm()},{passive:true});
+  function snap(){if(touching||busy)return;const off=head(),range=innerHeight*.35;let best=null,bd=1e9;
+    secs.forEach(s=>{const d=s.getBoundingClientRect().top-off;if(Math.abs(d)<bd){bd=Math.abs(d);best=d}});
+    if(best===null||bd<2||bd>range)return;if(innerHeight+scrollY>=document.documentElement.scrollHeight-4&&best>0)return;
+    busy=true;scrollBy({top:best,behavior:still?'auto':'smooth'});setTimeout(()=>{busy=false},700);}
+  function arm(){clearTimeout(t);t=setTimeout(snap,140);}
+  addEventListener('scroll',()=>{if(!busy)arm()},{passive:true});})();
 
 // 다리 문장: 화면에 들어오면 떠오름
 (function(){const bs=document.querySelectorAll('.bridge');if(!('IntersectionObserver' in window)){document.documentElement.classList.add('no-io');return;}
