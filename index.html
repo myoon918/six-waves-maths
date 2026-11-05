@@ -227,6 +227,9 @@ details:hover{background:#e6f1fa}
 .value{margin:72px auto 0;text-align:center;font-size:28px;font-weight:500;letter-spacing:-.03em;line-height:1.2;color:var(--mist);max-width:760px}
 @media (min-width:760px){.value{font-size:40px}}
 #morning .two,#lesson .two{align-items:center}
+
+.lanes{width:100%;height:auto;display:block}.lanes text{fill:var(--silver)}.lanes .track{stroke:var(--line);stroke-width:3;stroke-linecap:round}.lanes .prog{stroke:var(--sky);stroke-width:3;stroke-linecap:round}.lanes .now{fill:var(--sky)}.lanes .flag{fill:var(--mist);stroke:var(--mist);stroke-width:2;stroke-linejoin:round}
+#each .two{align-items:center}
 .fgroup{margin:30px 0 6px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}.fgroup:first-child{margin-top:0}
 @media (prefers-reduced-motion:reduce){.bridge{opacity:1;transform:none;transition:none}.bridge::after,.hero .cue::after{animation:none}}
 </style>
@@ -305,7 +308,33 @@ details:hover{background:#e6f1fa}
     <div class="card fcard flowcard" style="padding:22px 14px"><div class="ex" style="padding-left:6px"><k>한 주</k><e>One week</e></div><svg id="week" viewBox="0 0 400 212" role="img" aria-label="Six days of homework, then the lesson on day seven" style="margin:0 auto"></svg><p class="cap"><k>6일 숙제, 7일째 수업.</k><e>Six days of homework. Day 7: the lesson.</e></p></div>
   </div>
   <p class="value"><k>목표를 정하고, 계획대로 하고,<br>해내는 경험을 합니다.</k><e>Set a goal. Follow the plan.<br>Let your child experience success.</e></p>
-  <a class="bridge" href="#day"><k>여기까지가 한 주입니다. 하루는 이렇습니다.</k><e>That is one week on paper. Here is what a day feels like.</e></a>
+  <a class="bridge" href="#each"><k>한 그룹에 아이가 여럿인데, 우리 아이는요?</k><e>Several children in one group. What about mine?</e></a>
+</div></section>
+
+<!-- 4b 아이마다 다른 계획 -->
+<section id="each"><div class="wrap">
+  <div class="two">
+    <div>
+      <div class="badge"><k>한 그룹, 아이마다 다른 계획</k><e>One group, one plan per child</e></div>
+      <h2><k>같은 수업,<br>아이마다 다른 계획.</k><e>One group.<br>A plan for each child.</e></h2>
+      <ul class="rows steps">
+        <li><k>숙제는 아이마다 각자 진도로 나갑니다. 같은 그룹이어도 매일 받는 문제가 다릅니다.</k><e>Homework runs at each child's own pace. Same group, different questions every day.</e></li>
+        <li><k>학교 시험은 학교마다 날짜도 범위도 다릅니다. 시험 14일 전부터 그 아이 학교 범위로 따로 준비합니다.</k><e>Every school sets its own exam dates and topics. From 14 days out, each child prepares for their own school's exam.</e></li>
+        <li><k>수업에서는 그 아이가 보관한 문제를 선생님과 1:1로 풉니다.</k><e>In the lesson, each child works one-on-one through the questions they saved.</e></li>
+      </ul>
+    </div>
+    <div class="card fcard flowcard" style="padding:22px 14px"><div class="ex" style="padding-left:6px"><k>한 그룹, 네 개의 계획</k><e>One group, four plans</e></div>
+      <svg class="lanes" viewBox="0 0 400 196" role="img" aria-label="Four children in one group, each at a different point, each with their own school exam date" style="margin:0 auto">
+        <g font-size="15" font-weight="500">
+          <text x="14" y="45">A</text><line class="track" x1="44" y1="40" x2="386" y2="40"/><line class="prog" x1="44" y1="40" x2="150" y2="40"/><circle class="now" cx="150" cy="40" r="7"/><path class="flag" d="M322 40 V20 l14 5 -14 5"/>
+          <text x="14" y="89">B</text><line class="track" x1="44" y1="84" x2="386" y2="84"/><line class="prog" x1="44" y1="84" x2="246" y2="84"/><circle class="now" cx="246" cy="84" r="7"/><path class="flag" d="M286 84 V64 l14 5 -14 5"/>
+          <text x="14" y="133">C</text><line class="track" x1="44" y1="128" x2="386" y2="128"/><line class="prog" x1="44" y1="128" x2="196" y2="128"/><circle class="now" cx="196" cy="128" r="7"/>
+          <text x="14" y="177">D</text><line class="track" x1="44" y1="172" x2="386" y2="172"/><line class="prog" x1="44" y1="172" x2="300" y2="172"/><circle class="now" cx="300" cy="172" r="7"/><path class="flag" d="M366 172 V152 l14 5 -14 5"/>
+        </g>
+      </svg>
+      <p class="cap"><span style="color:var(--sky)">●</span> <k>지금 진도 &nbsp;⚑ 그 아이 학교 시험</k><e>Where each child is &nbsp;⚑ Their own school exam</e></p></div>
+  </div>
+  <a class="bridge" href="#day"><k>그럼 한 아이의 하루를 볼까요?</k><e>Now, one child's day.</e></a>
 </div></section>
 
 <!-- 5 하루 체험 -->
