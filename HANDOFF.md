@@ -1,6 +1,6 @@
 # Six Waves Maths 사이트 작업 인수인계 (새 창에서 이어갈 때 먼저 읽기)
 
-최종 업데이트 2026-11-05. 이 파일을 새 Claude Code 세션에 읽히면 같은 맥락에서 이어갈 수 있다.
+최종 업데이트 2026-11-09. 이 파일을 새 Claude Code 세션에 읽히면 같은 맥락에서 이어갈 수 있다.
 
 ## 역할과 말투
 - Moses(시드니 수학 튜터, NSW 교사)의 학원 홍보 사이트 담당 창.
@@ -17,16 +17,17 @@
 - 확정 사실: 주 1회 90분, 1–4명. 숙제는 아이별 진도, 학교 시험 대비도 아이별로. 매일 아이패드 펜 숙제, 획·멈춤·지운 줄이 남고 수업 전에 읽는다. 다음 날 아침 자동 결과 메시지. 틀린 문제는 전체 풀이 + 비슷한 문제, 1·3·7일 뒤 다시. 못 푼 문제는 보관해 수업에서 1:1. 수업은 한 주 테스트, 보관 문제 1:1, 더 어려운 시험형 문제. 수업 뒤 짧은 주간 리포트. 숙제 안 하면 바로 팔로우업. 시험 14일 전부터 시험형 숙제. 숙제 시간 7–9학년 30–45분, 10–12학년 45–60분. 선생님은 호주 고등학교(셀렉티브 포함)와 대학교 20년, 세 딸의 아빠. 가치는 "목표를 정하고, 계획대로 하고, 해내는 경험".
 
 ## 파일과 주소
-- `index.html` 흰색판 → https://myoon918.github.io/six-waves-maths/
-- `dark/index.html` 짙은판 → /dark/
-- `mix/index.html` 번갈아판 (첫 화면 D 배치) → /mix/
-- 세 파일은 같은 본문 구조. 한국어/영어는 `<k>`/`<e>` 태그로 같이 들어 있다.
-- 비공개 아티팩트 (같은 내용): 흰색 https://claude.ai/artifact/KdE5yFUUYnBPF7dt9vKNnz , 짙은 https://claude.ai/artifact/7PnKBFkReegVjk59tqchU3 , 번갈아 https://claude.ai/artifact/Wk1HcvexdmvLcerbvDkDJa
+- 디자인은 번갈아판 하나로 정했다 (2026-11-09, Moses). 첫 화면 짙게, 다음 칸 희게 번갈아, 첫 화면은 D 배치(큰 구가 제목 뒤에 옅게).
+- `index.html` 번갈아판 → https://myoon918.github.io/six-waves-maths/
+- `dark/index.html`, `mix/index.html` 은 예전 주소를 위한 넘김 페이지일 뿐이다. 고치지 않는다.
+- 흰색판·짙은판은 더 이상 관리하지 않는다.
+- 한국어/영어는 `<k>`/`<e>` 태그로 같이 들어 있다.
+- 비공개 아티팩트: 번갈아 https://claude.ai/artifact/Wk1HcvexdmvLcerbvDkDJa (흰색 KdE5yFUUYnBPF7dt9vKNnz, 짙은 7PnKBFkReegVjk59tqchU3 도 같은 번갈아판 내용으로 맞춰 두었다)
 - `main`에 push 하면 `.github/workflows/pages.yml`이 배포한다. 가끔 자동 실행이 안 되면 수동 실행
   `gh api -X POST repos/myoon918/six-waves-maths/actions/workflows/pages.yml/dispatches -f ref=main`
 
 ## 새 창에서 수정하는 방법
-1. 세 HTML 파일을 직접 고친다 (같은 변경을 세 군데 모두).
+1. `index.html` 하나만 고친다.
 2. 폰 크기(390×844) 스크린샷으로 확인한다. 브라우저는 미리 설치된 Playwright Chromium.
 3. 커밋하고 `git push -u origin main`.
 4. 아티팩트도 맞추려면 Artifact 도구에 위 URL을 `url`로 넘겨 다시 publish 한다 (먼저 read).
@@ -50,7 +51,6 @@ FAQ는 CMC Education 사이트가 답하는 학부모 질문 30개를 기준으�
 - 다음 날 아침 메시지를 받는 사람이 학생인지 부모인지
 - "Years 7–12" 표기 가능 여부
 - 수업료, 장소, 요일·시간, 대면/온라인, 수업 언어, 펜 종류·아이패드 없는 경우, 체험 수업, 학교 진도 방식, 결석·방학 규정, 연락 방법, 실명·사진
-- 세 버전 중 기본으로 쓸 판
 - 형제 할인 여부와 비율 (CMC는 이용약관에만 둘째부터 5%, 두 반 수강 시 각 5%)
 - 그룹을 나누는 기준 (CMC는 학교별로 묶고, 안 되면 학년·실력으로 묶는다고 홈 FAQ에 씀)
 
@@ -60,4 +60,4 @@ FAQ는 CMC Education 사이트가 답하는 학부모 질문 30개를 기준으�
 - 시안 2 https://myoon918.github.io/six-waves-maths/try/2/ 선생님이 하는 일 (추천). "매일, 아이 한 명씩 계획을 다시 짭니다." 카드 "어제 풀이를 읽고 오늘 숙제를 정합니다", "그 아이 학교 범위로 바꿉니다"
 - 시안 3 https://myoon918.github.io/six-waves-maths/try/3/ 가장 짧게. "한 그룹, 네 개의 계획." 카드 "숙제는 각자", "시험도 각자"
 - 시안 2를 넣기 전에 확인할 것: 선생님이 매일 풀이를 보고 다음 숙제를 직접 고르는지, 정해진 순서로 자동으로 나가는지. 사실과 다르면 문장을 고친다.
-- 고르면 세 HTML 파일(`index.html`, `dark/index.html`, `mix/index.html`)의 `<!-- 4b 아이마다 따로 -->` 섹션 글을 바꾸고, `try/` 폴더는 지운다.
+- 고르면 `index.html`의 `<!-- 4b 아이마다 따로 -->` 섹션 글을 바꾸고, `try/` 폴더는 지운다.
